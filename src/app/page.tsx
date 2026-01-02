@@ -23,16 +23,11 @@ export default function LandingPage() {
               <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center animate-float">
                 <Moon className="w-5 h-5 text-accent-foreground" />
               </div>
-              <span className="text-lg font-semibold">한줄일기</span>
+              <span className="text-lg font-semibold">2026 한줄일기</span>
             </div>
-            <div className="flex items-center gap-3">
-              <Link href="/login">
-                <Button variant="ghost" size="sm">로그인</Button>
-              </Link>
-              <Link href="/signup">
-                <Button size="sm">시작하기</Button>
-              </Link>
-            </div>
+            <Link href="/signup">
+              <Button size="sm">무료로 시작하기</Button>
+            </Link>
           </nav>
         </header>
 
@@ -55,18 +50,11 @@ export default function LandingPage() {
               다음날 아침 9시에 소중한 사람들의 답변을 확인하세요.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup">
-                <Button size="xl" variant="accent" className="w-full sm:w-auto">
-                  무료로 시작하기
-                </Button>
-              </Link>
-              <Link href="/login">
-                <Button size="xl" variant="outline" className="w-full sm:w-auto">
-                  로그인
-                </Button>
-              </Link>
-            </div>
+            <Link href="/signup">
+              <Button size="xl" variant="accent">
+                무료로 시작하기
+              </Button>
+            </Link>
           </div>
 
           {/* Features */}
@@ -140,7 +128,7 @@ export default function LandingPage() {
         {/* Footer */}
         <footer className="border-t border-border py-8">
           <div className="container mx-auto px-4 text-center text-muted-foreground text-sm">
-            <p>2024 한줄일기. Made with love.</p>
+            <p>2026 한줄일기. Made with love.</p>
           </div>
         </footer>
       </div>
