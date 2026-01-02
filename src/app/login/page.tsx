@@ -1,50 +1,31 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Moon } from 'lucide-react'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
   const supabase = createClient()
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setIsLoading(true)
-
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) {
-        toast.error(error.message)
-        return
-      }
-
-      toast.success('로그인 성공!')
-      router.push('/today')
-      router.refresh()
-    } catch {
-      toast.error('로그인 중 오류가 발생했습니다.')
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   async function handleGoogleLogin() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      toast.error(error.message)
+    }
+  }
+
+  async function handleKakaoLogin() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'kakao',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
@@ -71,54 +52,13 @@ export default function LoginPage() {
               <Moon className="w-6 h-6 text-accent-foreground" />
             </div>
           </Link>
-          <CardTitle className="text-2xl">다시 만나서 반가워요</CardTitle>
-          <CardDescription>이메일로 로그인하세요</CardDescription>
+          <CardTitle className="text-2xl">2026 한줄일기</CardTitle>
+          <CardDescription>간편하게 로그인하세요</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                이메일
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="hello@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium">
-                비밀번호
-              </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="비밀번호를 입력하세요"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" isLoading={isLoading}>
-              로그인
-            </Button>
-          </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">또는</span>
-            </div>
-          </div>
-
+        <CardContent className="space-y-3">
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full h-12"
             onClick={handleGoogleLogin}
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -139,14 +79,29 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
               />
             </svg>
-            Google로 로그인
+            Google로 계속하기
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            아직 계정이 없으신가요?{' '}
-            <Link href="/signup" className="text-primary hover:underline">
-              회원가입
-            </Link>
+          <Button
+            variant="outline"
+            className="w-full h-12 bg-[#FEE500] hover:bg-[#FDD835] text-[#191919] border-[#FEE500]"
+            onClick={handleKakaoLogin}
+          >
+            <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12 3C6.48 3 2 6.48 2 10.5c0 2.52 1.64 4.74 4.12 6.02-.18.64-.66 2.32-.76 2.68-.12.44.16.44.34.32.14-.1 2.26-1.54 3.2-2.16.68.1 1.4.14 2.1.14 5.52 0 10-3.48 10-7.5S17.52 3 12 3z"
+              />
+            </svg>
+            카카오로 계속하기
+          </Button>
+
+          <p className="text-center text-xs text-muted-foreground mt-6 pt-4">
+            로그인하면{' '}
+            <Link href="/terms" className="underline">이용약관</Link>
+            {' '}및{' '}
+            <Link href="/privacy" className="underline">개인정보처리방침</Link>
+            에 동의하게 됩니다.
           </p>
         </CardContent>
       </Card>

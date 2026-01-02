@@ -13,19 +13,19 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   title: {
-    default: '한줄일기',
-    template: '%s | 한줄일기',
+    default: '2026 한줄일기',
+    template: '%s | 2026 한줄일기',
   },
   description: '매일 자정, 단 한 문장의 질문에 답하고 다음날 아침 서로의 답변을 확인하세요.',
-  keywords: ['일기', '공유일기', '커플일기', '가족일기', '질문일기', '한줄일기'],
+  keywords: ['일기', '공유일기', '커플일기', '가족일기', '질문일기', '한줄일기', '2026'],
   authors: [{ name: 'One Sentence Journal' }],
   metadataBase: new URL('https://one-sentence-journal-two.vercel.app'),
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
     url: 'https://one-sentence-journal-two.vercel.app',
-    siteName: '한줄일기',
-    title: '한줄일기 - 매일 한 문장으로 마음을 나누세요',
+    siteName: '2026 한줄일기',
+    title: '2026 한줄일기 - 매일 한 문장으로 마음을 나누세요',
     description: '매일 자정, 단 한 문장의 질문에 답하고 다음날 아침 서로의 답변을 확인하세요.',
     images: [
       {
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '한줄일기',
+    title: '2026 한줄일기',
     description: '매일 자정, 단 한 문장의 질문에 답하고 다음날 아침 서로의 답변을 확인하세요.',
     images: ['/og-image.png'],
   },
