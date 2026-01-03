@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Users, Copy, Crown, LogOut, ChevronRight } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Users, Copy, Crown, LogOut, ChevronRight, Pencil, Trash2, Check, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
@@ -25,6 +26,11 @@ interface GroupListProps {
 export function GroupList({ groups, userId }: GroupListProps) {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null)
   const [isLeaving, setIsLeaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editName, setEditName] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const supabase = createClient()
   const router = useRouter()
 
@@ -56,6 +62,74 @@ export function GroupList({ groups, userId }: GroupListProps) {
     } finally {
       setIsLeaving(false)
     }
+  }
+
+  async function updateGroupName(groupId: string) {
+    if (!editName.trim()) {
+      toast.error('그룹 이름을 입력해주세요')
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const { error } = await supabase
+        .from('journal_groups')
+        .update({ name: editName.trim() })
+        .eq('id', groupId)
+
+      if (error) throw error
+
+      toast.success('그룹 이름이 변경되었습니다')
+      setIsEditing(false)
+      setSelectedGroup(prev => prev ? { ...prev, name: editName.trim() } : null)
+      router.refresh()
+    } catch {
+      toast.error('이름 변경에 실패했습니다')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  async function deleteGroup(groupId: string) {
+    setIsDeleting(true)
+    try {
+      // 먼저 그룹 멤버 삭제
+      const { error: membersError } = await supabase
+        .from('journal_group_members')
+        .delete()
+        .eq('group_id', groupId)
+
+      if (membersError) throw membersError
+
+      // 그룹 삭제
+      const { error: groupError } = await supabase
+        .from('journal_groups')
+        .delete()
+        .eq('id', groupId)
+
+      if (groupError) throw groupError
+
+      toast.success('그룹이 삭제되었습니다')
+      setSelectedGroup(null)
+      setShowDeleteConfirm(false)
+      router.refresh()
+    } catch {
+      toast.error('그룹 삭제에 실패했습니다')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  function startEditing() {
+    if (selectedGroup) {
+      setEditName(selectedGroup.name)
+      setIsEditing(true)
+    }
+  }
+
+  function cancelEditing() {
+    setIsEditing(false)
+    setEditName('')
   }
 
   if (groups.length === 0) {
@@ -108,13 +182,71 @@ export function GroupList({ groups, userId }: GroupListProps) {
         ))}
       </div>
 
-      <Dialog open={!!selectedGroup} onOpenChange={() => setSelectedGroup(null)}>
-        <DialogContent onClose={() => setSelectedGroup(null)}>
+      <Dialog open={!!selectedGroup} onOpenChange={(open) => {
+        if (!open) {
+          setSelectedGroup(null)
+          setIsEditing(false)
+          setShowDeleteConfirm(false)
+        }
+      }}>
+        <DialogContent onClose={() => {
+          setSelectedGroup(null)
+          setIsEditing(false)
+          setShowDeleteConfirm(false)
+        }}>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {selectedGroup?.name}
-              {selectedGroup?.isOwner && (
-                <Crown className="w-4 h-4 text-accent" />
+              {isEditing ? (
+                <div className="flex items-center gap-2 flex-1">
+                  <Input
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="h-8"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        selectedGroup && updateGroupName(selectedGroup.id)
+                      } else if (e.key === 'Escape') {
+                        cancelEditing()
+                      }
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
+                    onClick={() => selectedGroup && updateGroupName(selectedGroup.id)}
+                    disabled={isSaving}
+                  >
+                    <Check className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 hover:bg-muted"
+                    onClick={cancelEditing}
+                    disabled={isSaving}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  {selectedGroup?.name}
+                  {selectedGroup?.isOwner && (
+                    <>
+                      <Crown className="w-4 h-4 text-accent" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 hover:bg-primary/10 hover:text-primary"
+                        onClick={startEditing}
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </Button>
+                    </>
+                  )}
+                </>
               )}
             </DialogTitle>
             <DialogDescription>
@@ -140,7 +272,44 @@ export function GroupList({ groups, userId }: GroupListProps) {
               </div>
             </div>
 
-            {!selectedGroup?.isOwner && (
+            {selectedGroup?.isOwner ? (
+              showDeleteConfirm ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-center text-muted-foreground">
+                    정말 그룹을 삭제하시겠습니까?<br />
+                    <span className="text-destructive">모든 멤버가 그룹에서 제외됩니다.</span>
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={isDeleting}
+                    >
+                      취소
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className="flex-1"
+                      onClick={() => selectedGroup && deleteGroup(selectedGroup.id)}
+                      isLoading={isDeleting}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      삭제
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
+                  onClick={() => setShowDeleteConfirm(true)}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  그룹 삭제
+                </Button>
+              )
+            ) : (
               <Button
                 variant="outline"
                 className="w-full text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
