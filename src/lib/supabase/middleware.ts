@@ -45,8 +45,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // 로그인 상태에서 로그인/회원가입 페이지 접근 시
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
+  // 로그인 상태에서 랜딩/로그인/회원가입 페이지 접근 시 → /today로 리다이렉트
+  const authPages = ['/', '/login', '/signup']
+  if (user && authPages.includes(request.nextUrl.pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/today'
     return NextResponse.redirect(url)
