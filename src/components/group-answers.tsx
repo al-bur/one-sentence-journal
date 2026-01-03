@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Avatar } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { createClient } from '@/lib/supabase/client'
+import { MessageCircle } from 'lucide-react'
 
 interface GroupAnswersProps {
   dailyQuestionId: string
@@ -76,11 +77,13 @@ export function GroupAnswers({ dailyQuestionId, userId, groups }: GroupAnswersPr
     return (
       <div className="space-y-4">
         {[1, 2].map(i => (
-          <div key={i} className="flex items-start gap-3">
-            <Skeleton className="w-10 h-10 rounded-full" />
-            <div className="flex-1 space-y-2">
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-16 w-full" />
+          <div key={i} className="glass rounded-2xl p-5">
+            <div className="flex items-start gap-4">
+              <Skeleton className="w-12 h-12 rounded-2xl" />
+              <div className="flex-1 space-y-3">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-16 w-full rounded-xl" />
+              </div>
             </div>
           </div>
         ))}
@@ -90,7 +93,10 @@ export function GroupAnswers({ dailyQuestionId, userId, groups }: GroupAnswersPr
 
   if (answers.length === 0) {
     return (
-      <div className="p-8 rounded-2xl bg-card border border-border text-center">
+      <div className="glass rounded-3xl p-12 text-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center">
+          <MessageCircle className="w-8 h-8 text-primary" />
+        </div>
         <p className="text-muted-foreground">
           아직 답변한 그룹원이 없어요
         </p>
@@ -100,23 +106,27 @@ export function GroupAnswers({ dailyQuestionId, userId, groups }: GroupAnswersPr
 
   return (
     <div className="space-y-4">
-      {answers.map(answer => (
+      {answers.map((answer, index) => (
         <div
           key={answer.id}
-          className="p-4 rounded-2xl bg-card border border-border animate-fade-in"
+          className="glass rounded-2xl p-5 animate-fade-in"
+          style={{ animationDelay: `${index * 0.1}s` }}
         >
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-4">
             <Avatar
               src={answer.user_avatar}
               alt={answer.user_name}
               fallback={answer.user_name}
               size="md"
+              className="w-12 h-12 rounded-2xl border-2 border-primary/20"
             />
             <div className="flex-1 min-w-0">
-              <p className="font-medium text-sm">{answer.user_name}</p>
-              <p className="mt-2 text-foreground leading-relaxed">
-                {answer.content}
-              </p>
+              <p className="font-semibold text-sm mb-3">{answer.user_name}</p>
+              <div className="p-4 rounded-xl bg-gradient-to-br from-secondary/50 to-secondary/30 border border-border/30">
+                <p className="text-foreground leading-relaxed">
+                  {answer.content}
+                </p>
+              </div>
             </div>
           </div>
         </div>

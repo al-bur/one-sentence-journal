@@ -1,10 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { Users, Copy, Crown, LogOut } from 'lucide-react'
+import { Users, Copy, Crown, LogOut, ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
@@ -61,14 +60,12 @@ export function GroupList({ groups, userId }: GroupListProps) {
 
   if (groups.length === 0) {
     return (
-      <div className="p-12 rounded-2xl bg-card border border-border text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center">
-          <Users className="w-8 h-8 text-accent" />
+      <div className="glass rounded-3xl p-12 text-center">
+        <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-accent/20 to-primary/10 flex items-center justify-center">
+          <Users className="w-10 h-10 text-accent" />
         </div>
-        <p className="text-muted-foreground mb-2">
-          아직 참여중인 그룹이 없어요
-        </p>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-lg font-medium mb-2">아직 참여중인 그룹이 없어요</p>
+        <p className="text-muted-foreground">
           새 그룹을 만들거나 초대 코드로 참여하세요
         </p>
       </div>
@@ -78,33 +75,36 @@ export function GroupList({ groups, userId }: GroupListProps) {
   return (
     <>
       <div className="space-y-3">
-        {groups.map((group) => (
-          <Card
+        {groups.map((group, index) => (
+          <div
             key={group.id}
-            className="cursor-pointer card-hover"
+            className="glass rounded-2xl p-4 cursor-pointer card-hover animate-fade-in"
+            style={{ animationDelay: `${index * 0.05}s` }}
             onClick={() => setSelectedGroup(group)}
           >
-            <CardContent className="py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/20 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-lg">{group.name}</h3>
+                    {group.isOwner && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-medium">
+                        <Crown className="w-3 h-3" />
+                        관리자
+                      </span>
+                    )}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{group.name}</h3>
-                      {group.isOwner && (
-                        <Crown className="w-4 h-4 text-accent" />
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {group.memberCount}명 참여중
-                    </p>
-                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {group.memberCount}명 참여중
+                  </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            </div>
+          </div>
         ))}
       </div>
 
@@ -123,15 +123,16 @@ export function GroupList({ groups, userId }: GroupListProps) {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-secondary/50">
+            <div className="p-4 rounded-xl bg-gradient-to-br from-secondary/50 to-secondary/30 border border-border/30">
               <p className="text-xs text-muted-foreground mb-2">초대 코드</p>
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xl tracking-widest">
+                <span className="font-mono text-2xl tracking-[0.3em] text-primary font-semibold">
                   {selectedGroup?.invite_code}
                 </span>
                 <Button
                   variant="ghost"
                   size="icon"
+                  className="hover:bg-primary/10 hover:text-primary"
                   onClick={() => selectedGroup && copyInviteCode(selectedGroup.invite_code)}
                 >
                   <Copy className="w-4 h-4" />
@@ -142,7 +143,7 @@ export function GroupList({ groups, userId }: GroupListProps) {
             {!selectedGroup?.isOwner && (
               <Button
                 variant="outline"
-                className="w-full text-destructive hover:text-destructive"
+                className="w-full text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
                 onClick={() => selectedGroup && leaveGroup(selectedGroup.id)}
                 isLoading={isLeaving}
               >

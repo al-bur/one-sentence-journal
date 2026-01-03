@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { GroupList } from '@/components/group-list'
 import { CreateGroupDialog } from '@/components/create-group-dialog'
 import { JoinGroupDialog } from '@/components/join-group-dialog'
+import { Users } from 'lucide-react'
 
 export const metadata = {
   title: '그룹',
@@ -68,12 +69,20 @@ export default async function GroupPage() {
   )
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold">그룹</h1>
-        <p className="text-muted-foreground text-sm mt-1">소중한 사람들과 함께해요</p>
+    <div className="max-w-2xl mx-auto space-y-8 pb-24">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-2">
+          <Users className="w-3 h-3" />
+          {groupsWithMembers.length}개의 그룹
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight">
+          <span className="gradient-text">그룹</span>
+        </h1>
+        <p className="text-muted-foreground">소중한 사람들과 함께해요</p>
       </div>
 
+      {/* Action Buttons */}
       <div className="flex gap-3">
         <CreateGroupDialog userId={user.id} />
         <JoinGroupDialog userId={user.id} />
