@@ -1,12 +1,18 @@
 'use client'
 
 import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { getTimeUntilDeadline } from '@/lib/utils'
 import { Send, Edit2, Check, Sparkles } from 'lucide-react'
+
+interface Answer {
+  id: string
+  content: string
+}
 
 interface TodayQuestionProps {
   question: {
@@ -15,10 +21,7 @@ interface TodayQuestionProps {
     category: string
   }
   dailyQuestionId: string
-  myAnswer: {
-    id: string
-    content: string
-  } | null
+  myAnswer: Answer | null
   userId: string
 }
 
@@ -30,13 +33,67 @@ export function TodayQuestion({
 }: TodayQuestionProps) {
   const [answer, setAnswer] = useState(initialAnswer?.content || '')
   const [isEditing, setIsEditing] = useState(!initialAnswer)
-  const [isLoading, setIsLoading] = useState(false)
-  const [savedAnswer, setSavedAnswer] = useState(initialAnswer)
+  const [savedAnswer, setSavedAnswer] = useState<Answer | null>(initialAnswer)
   const supabase = createClient()
+  const queryClient = useQueryClient()
 
   const maxLength = 100
 
-  async function handleSubmit() {
+  const submitMutation = useMutation({
+    mutationFn: async (content: string) => {
+      if (savedAnswer) {
+        // Update existing answer
+        const { error } = await supabase
+          .from('journal_answers')
+          .update({ content })
+          .eq('id', savedAnswer.id)
+
+        if (error) throw error
+        return { ...savedAnswer, content }
+      } else {
+        // Create new answer
+        const { data, error } = await supabase
+          .from('journal_answers')
+          .insert({
+            daily_question_id: dailyQuestionId,
+            user_id: userId,
+            content,
+          })
+          .select()
+          .single()
+
+        if (error) throw error
+        return data as Answer
+      }
+    },
+    onMutate: async (content) => {
+      // Optimistic update
+      const previousAnswer = savedAnswer
+
+      if (savedAnswer) {
+        setSavedAnswer({ ...savedAnswer, content })
+      } else {
+        setSavedAnswer({ id: 'temp-id', content })
+      }
+      setIsEditing(false)
+
+      return { previousAnswer }
+    },
+    onError: (error, content, context) => {
+      // Rollback on error
+      console.error(error)
+      setSavedAnswer(context?.previousAnswer ?? null)
+      setIsEditing(true)
+      toast.error('저장 중 오류가 발생했습니다')
+    },
+    onSuccess: (data) => {
+      setSavedAnswer(data)
+      toast.success(savedAnswer ? '답변이 수정되었습니다' : '답변이 저장되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['answers'] })
+    },
+  })
+
+  function handleSubmit() {
     if (!answer.trim()) {
       toast.error('답변을 입력해주세요')
       return
@@ -47,43 +104,7 @@ export function TodayQuestion({
       return
     }
 
-    setIsLoading(true)
-
-    try {
-      if (savedAnswer) {
-        const { error } = await supabase
-          .from('journal_answers')
-          .update({ content: answer.trim() })
-          .eq('id', savedAnswer.id)
-
-        if (error) throw error
-
-        setSavedAnswer({ ...savedAnswer, content: answer.trim() })
-        toast.success('답변이 수정되었습니다')
-      } else {
-        const { data, error } = await supabase
-          .from('journal_answers')
-          .insert({
-            daily_question_id: dailyQuestionId,
-            user_id: userId,
-            content: answer.trim(),
-          })
-          .select()
-          .single()
-
-        if (error) throw error
-
-        setSavedAnswer(data)
-        toast.success('답변이 저장되었습니다')
-      }
-
-      setIsEditing(false)
-    } catch (error) {
-      console.error(error)
-      toast.error('저장 중 오류가 발생했습니다')
-    } finally {
-      setIsLoading(false)
-    }
+    submitMutation.mutate(answer.trim())
   }
 
   return (
@@ -132,7 +153,7 @@ export function TodayQuestion({
                 )}
                 <Button
                   onClick={handleSubmit}
-                  isLoading={isLoading}
+                  isLoading={submitMutation.isPending}
                   className="bg-gradient-to-r from-primary to-accent hover:opacity-90 rounded-xl px-6"
                 >
                   <Send className="w-4 h-4 mr-2" />

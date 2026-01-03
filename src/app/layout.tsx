@@ -3,6 +3,7 @@ import { Geist } from 'next/font/google'
 import Script from 'next/script'
 import './globals.css'
 import { Toaster } from 'sonner'
+import { Providers } from '@/components/providers'
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID
 
@@ -74,7 +75,9 @@ export default function RootLayout({
         )}
       </head>
       <body className={`${geist.variable} min-h-screen antialiased`}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster
           position="top-center"
           toastOptions={{

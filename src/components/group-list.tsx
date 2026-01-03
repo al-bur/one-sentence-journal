@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -23,16 +24,15 @@ interface GroupListProps {
   userId: string
 }
 
-export function GroupList({ groups, userId }: GroupListProps) {
+export function GroupList({ groups: initialGroups, userId }: GroupListProps) {
+  const [groups, setGroups] = useState(initialGroups)
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null)
-  const [isLeaving, setIsLeaving] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editName, setEditName] = useState('')
-  const [isSaving, setIsSaving] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const supabase = createClient()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   async function copyInviteCode(code: string) {
     try {
@@ -43,9 +43,9 @@ export function GroupList({ groups, userId }: GroupListProps) {
     }
   }
 
-  async function leaveGroup(groupId: string) {
-    setIsLeaving(true)
-    try {
+  // Leave group mutation
+  const leaveMutation = useMutation({
+    mutationFn: async (groupId: string) => {
       const { error } = await supabase
         .from('journal_group_members')
         .delete()
@@ -53,47 +53,65 @@ export function GroupList({ groups, userId }: GroupListProps) {
         .eq('user_id', userId)
 
       if (error) throw error
-
-      toast.success('그룹을 나갔습니다')
+      return groupId
+    },
+    onMutate: async (groupId) => {
+      const previousGroups = groups
+      setGroups(prev => prev.filter(g => g.id !== groupId))
       setSelectedGroup(null)
-      router.refresh()
-    } catch {
+      return { previousGroups }
+    },
+    onError: (error, groupId, context) => {
+      console.error(error)
+      setGroups(context?.previousGroups ?? [])
       toast.error('그룹 나가기에 실패했습니다')
-    } finally {
-      setIsLeaving(false)
-    }
-  }
+    },
+    onSuccess: () => {
+      toast.success('그룹을 나갔습니다')
+      queryClient.invalidateQueries({ queryKey: ['groups'] })
+      router.refresh()
+    },
+  })
 
-  async function updateGroupName(groupId: string) {
-    if (!editName.trim()) {
-      toast.error('그룹 이름을 입력해주세요')
-      return
-    }
-
-    setIsSaving(true)
-    try {
+  // Update group name mutation
+  const updateNameMutation = useMutation({
+    mutationFn: async ({ groupId, name }: { groupId: string; name: string }) => {
       const { error } = await supabase
         .from('journal_groups')
-        .update({ name: editName.trim() })
+        .update({ name })
         .eq('id', groupId)
 
       if (error) throw error
+      return { groupId, name }
+    },
+    onMutate: async ({ groupId, name }) => {
+      const previousGroups = groups
+      const previousSelectedGroup = selectedGroup
 
-      toast.success('그룹 이름이 변경되었습니다')
+      setGroups(prev => prev.map(g => g.id === groupId ? { ...g, name } : g))
+      setSelectedGroup(prev => prev ? { ...prev, name } : null)
       setIsEditing(false)
-      setSelectedGroup(prev => prev ? { ...prev, name: editName.trim() } : null)
-      router.refresh()
-    } catch {
-      toast.error('이름 변경에 실패했습니다')
-    } finally {
-      setIsSaving(false)
-    }
-  }
 
-  async function deleteGroup(groupId: string) {
-    setIsDeleting(true)
-    try {
-      // 먼저 그룹 멤버 삭제
+      return { previousGroups, previousSelectedGroup }
+    },
+    onError: (error, variables, context) => {
+      console.error(error)
+      setGroups(context?.previousGroups ?? [])
+      setSelectedGroup(context?.previousSelectedGroup ?? null)
+      setIsEditing(true)
+      toast.error('이름 변경에 실패했습니다')
+    },
+    onSuccess: () => {
+      toast.success('그룹 이름이 변경되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['groups'] })
+      router.refresh()
+    },
+  })
+
+  // Delete group mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (groupId: string) => {
+      // Delete members first
       const { error: membersError } = await supabase
         .from('journal_group_members')
         .delete()
@@ -101,24 +119,33 @@ export function GroupList({ groups, userId }: GroupListProps) {
 
       if (membersError) throw membersError
 
-      // 그룹 삭제
+      // Delete group
       const { error: groupError } = await supabase
         .from('journal_groups')
         .delete()
         .eq('id', groupId)
 
       if (groupError) throw groupError
-
-      toast.success('그룹이 삭제되었습니다')
+      return groupId
+    },
+    onMutate: async (groupId) => {
+      const previousGroups = groups
+      setGroups(prev => prev.filter(g => g.id !== groupId))
       setSelectedGroup(null)
       setShowDeleteConfirm(false)
-      router.refresh()
-    } catch {
+      return { previousGroups }
+    },
+    onError: (error, groupId, context) => {
+      console.error(error)
+      setGroups(context?.previousGroups ?? [])
       toast.error('그룹 삭제에 실패했습니다')
-    } finally {
-      setIsDeleting(false)
-    }
-  }
+    },
+    onSuccess: () => {
+      toast.success('그룹이 삭제되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['groups'] })
+      router.refresh()
+    },
+  })
 
   function startEditing() {
     if (selectedGroup) {
@@ -130,6 +157,16 @@ export function GroupList({ groups, userId }: GroupListProps) {
   function cancelEditing() {
     setIsEditing(false)
     setEditName('')
+  }
+
+  function handleUpdateName() {
+    if (!editName.trim()) {
+      toast.error('그룹 이름을 입력해주세요')
+      return
+    }
+    if (selectedGroup) {
+      updateNameMutation.mutate({ groupId: selectedGroup.id, name: editName.trim() })
+    }
   }
 
   if (groups.length === 0) {
@@ -205,7 +242,7 @@ export function GroupList({ groups, userId }: GroupListProps) {
                     autoFocus
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        selectedGroup && updateGroupName(selectedGroup.id)
+                        handleUpdateName()
                       } else if (e.key === 'Escape') {
                         cancelEditing()
                       }
@@ -215,8 +252,8 @@ export function GroupList({ groups, userId }: GroupListProps) {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 hover:bg-primary/10 hover:text-primary"
-                    onClick={() => selectedGroup && updateGroupName(selectedGroup.id)}
-                    disabled={isSaving}
+                    onClick={handleUpdateName}
+                    disabled={updateNameMutation.isPending}
                   >
                     <Check className="w-4 h-4" />
                   </Button>
@@ -225,7 +262,7 @@ export function GroupList({ groups, userId }: GroupListProps) {
                     size="icon"
                     className="h-8 w-8 hover:bg-muted"
                     onClick={cancelEditing}
-                    disabled={isSaving}
+                    disabled={updateNameMutation.isPending}
                   >
                     <X className="w-4 h-4" />
                   </Button>
@@ -284,15 +321,15 @@ export function GroupList({ groups, userId }: GroupListProps) {
                       variant="outline"
                       className="flex-1"
                       onClick={() => setShowDeleteConfirm(false)}
-                      disabled={isDeleting}
+                      disabled={deleteMutation.isPending}
                     >
                       취소
                     </Button>
                     <Button
                       variant="destructive"
                       className="flex-1"
-                      onClick={() => selectedGroup && deleteGroup(selectedGroup.id)}
-                      isLoading={isDeleting}
+                      onClick={() => selectedGroup && deleteMutation.mutate(selectedGroup.id)}
+                      isLoading={deleteMutation.isPending}
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
                       삭제
@@ -313,8 +350,8 @@ export function GroupList({ groups, userId }: GroupListProps) {
               <Button
                 variant="outline"
                 className="w-full text-destructive hover:text-destructive border-destructive/30 hover:bg-destructive/10"
-                onClick={() => selectedGroup && leaveGroup(selectedGroup.id)}
-                isLoading={isLeaving}
+                onClick={() => selectedGroup && leaveMutation.mutate(selectedGroup.id)}
+                isLoading={leaveMutation.isPending}
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 그룹 나가기
