@@ -16,7 +16,7 @@ interface GroupMembership {
 
 interface DailyQuestionWithQuestion {
   id: string
-  date: string
+  question_date: string
   journal_questions: {
     id: string
     content: string
@@ -39,14 +39,14 @@ export default async function TodayPage() {
     .from('journal_daily_questions')
     .select(`
       id,
-      date,
+      question_date,
       journal_questions (
         id,
         content,
         category
       )
     `)
-    .eq('date', todayStr)
+    .eq('question_date', todayStr)
     .single()
 
   const dailyQuestion = dailyQuestionData as DailyQuestionWithQuestion | null

@@ -9,7 +9,7 @@ interface TimelineAnswer {
   created_at: string
   journal_daily_questions: {
     id: string
-    date: string
+    question_date: string
     journal_questions: {
       id: string
       content: string
@@ -42,7 +42,7 @@ export function TimelineList({ answers }: TimelineListProps) {
   // 날짜별로 그룹화
   const groupedByMonth: Record<string, TimelineAnswer[]> = {}
   answers.forEach(answer => {
-    const date = new Date(answer.journal_daily_questions.date)
+    const date = new Date(answer.journal_daily_questions.question_date)
     const monthKey = `${date.getFullYear()}년 ${date.getMonth() + 1}월`
     if (!groupedByMonth[monthKey]) {
       groupedByMonth[monthKey] = []
@@ -67,7 +67,7 @@ export function TimelineList({ answers }: TimelineListProps) {
                 <CardContent className="pt-4">
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <span className="text-xs text-muted-foreground">
-                      {formatDate(answer.journal_daily_questions.date)}
+                      {formatDate(answer.journal_daily_questions.question_date)}
                     </span>
                     <span className="text-xs text-primary uppercase tracking-wider">
                       {answer.journal_daily_questions.journal_questions.category}

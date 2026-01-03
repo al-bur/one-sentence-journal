@@ -28,11 +28,11 @@ export async function GET(request: Request) {
     const { data: existing } = await supabase
       .from('journal_daily_questions')
       .select('id')
-      .eq('date', todayStr)
+      .eq('question_date', todayStr)
       .single()
 
     if (existing) {
-      return NextResponse.json({ message: 'Daily question already exists', date: todayStr })
+      return NextResponse.json({ message: 'Daily question already exists', question_date: todayStr })
     }
 
     // 최근 30일 동안 사용된 질문 제외하고 랜덤 선택
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     const { data: recentQuestions } = await supabase
       .from('journal_daily_questions')
       .select('question_id')
-      .gte('date', thirtyDaysAgo)
+      .gte('question_date', thirtyDaysAgo)
 
     const recentIds = recentQuestions?.map(q => q.question_id) || []
 
@@ -72,13 +72,13 @@ export async function GET(request: Request) {
       const { error } = await supabase
         .from('journal_daily_questions')
         .insert({
-          date: todayStr,
+          question_date: todayStr,
           question_id: anyQuestion.id,
         })
 
       if (error) throw error
 
-      return NextResponse.json({ success: true, date: todayStr, question_id: anyQuestion.id })
+      return NextResponse.json({ success: true, question_date: todayStr, question_id: anyQuestion.id })
     }
 
     // 랜덤 선택
@@ -88,13 +88,13 @@ export async function GET(request: Request) {
     const { error } = await supabase
       .from('journal_daily_questions')
       .insert({
-        date: todayStr,
+        question_date: todayStr,
         question_id: selectedQuestion.id,
       })
 
     if (error) throw error
 
-    return NextResponse.json({ success: true, date: todayStr, question_id: selectedQuestion.id })
+    return NextResponse.json({ success: true, question_date: todayStr, question_id: selectedQuestion.id })
   } catch (error) {
     console.error('Cron error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

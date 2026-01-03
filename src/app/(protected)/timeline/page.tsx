@@ -56,7 +56,7 @@ export default async function TimelinePage() {
       created_at: a.created_at || new Date().toISOString(),
       journal_daily_questions: {
         id: a.journal_daily_questions!.id,
-        date: a.journal_daily_questions!.question_date,
+        question_date: a.journal_daily_questions!.question_date,
         journal_questions: {
           id: a.journal_daily_questions!.journal_questions!.id,
           content: a.journal_daily_questions!.journal_questions!.content,
