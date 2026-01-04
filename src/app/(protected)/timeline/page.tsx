@@ -70,13 +70,11 @@ export default async function TimelinePage() {
     <div className="max-w-2xl mx-auto space-y-8 pb-24">
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium mb-2">
           <BookOpen className="w-3 h-3" />
           {answers.length}개의 기록
         </div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          <span className="gradient-text">타임라인</span>
-        </h1>
+        <h1 className="text-2xl font-bold">타임라인</h1>
         <p className="text-muted-foreground">나의 한줄일기 모아보기</p>
       </div>
 

@@ -171,9 +171,9 @@ export function GroupList({ groups: initialGroups, userId }: GroupListProps) {
 
   if (groups.length === 0) {
     return (
-      <div className="glass rounded-3xl p-12 text-center">
-        <div className="w-20 h-20 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-accent/20 to-primary/10 flex items-center justify-center">
-          <Users className="w-10 h-10 text-accent" />
+      <div className="card-elevated p-12 text-center">
+        <div className="feature-icon feature-icon-blue mx-auto mb-6">
+          <Users className="w-6 h-6" />
         </div>
         <p className="text-lg font-medium mb-2">아직 참여중인 그룹이 없어요</p>
         <p className="text-muted-foreground">
@@ -189,20 +189,20 @@ export function GroupList({ groups: initialGroups, userId }: GroupListProps) {
         {groups.map((group, index) => (
           <div
             key={group.id}
-            className="glass rounded-2xl p-4 cursor-pointer card-hover animate-fade-in"
+            className="card-interactive p-4 cursor-pointer animate-fade-in"
             style={{ animationDelay: `${index * 0.05}s` }}
             onClick={() => setSelectedGroup(group)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/30 to-accent/20 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-primary" />
+                <div className="feature-icon feature-icon-blue">
+                  <Users className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-lg">{group.name}</h3>
+                    <h3 className="font-semibold">{group.name}</h3>
                     {group.isOwner && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-medium">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium">
                         <Crown className="w-3 h-3" />
                         관리자
                       </span>
@@ -272,7 +272,7 @@ export function GroupList({ groups: initialGroups, userId }: GroupListProps) {
                   {selectedGroup?.name}
                   {selectedGroup?.isOwner && (
                     <>
-                      <Crown className="w-4 h-4 text-accent" />
+                      <Crown className="w-4 h-4 text-primary" />
                       <Button
                         variant="ghost"
                         size="icon"
@@ -292,7 +292,7 @@ export function GroupList({ groups: initialGroups, userId }: GroupListProps) {
           </DialogHeader>
 
           <div className="space-y-4">
-            <div className="p-4 rounded-xl bg-gradient-to-br from-secondary/50 to-secondary/30 border border-border/30">
+            <div className="p-4 rounded-xl bg-secondary border border-border">
               <p className="text-xs text-muted-foreground mb-2">초대 코드</p>
               <div className="flex items-center justify-between">
                 <span className="font-mono text-2xl tracking-[0.3em] text-primary font-semibold">

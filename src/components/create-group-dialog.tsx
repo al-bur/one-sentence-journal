@@ -139,13 +139,13 @@ export function CreateGroupDialog({ userId }: CreateGroupDialogProps) {
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-secondary/50 text-center">
-                  <p className="text-xs text-muted-foreground mb-2">초대 코드</p>
-                  <div className="flex items-center justify-center gap-2">
-                    <span className="font-mono text-2xl tracking-widest">
+                <div className="p-6 rounded-xl bg-secondary border border-border text-center">
+                  <p className="text-xs text-muted-foreground mb-3">초대 코드</p>
+                  <div className="flex items-center justify-center gap-3">
+                    <span className="font-mono text-3xl tracking-[0.3em] text-primary font-semibold">
                       {createdGroup?.invite_code}
                     </span>
-                    <Button variant="ghost" size="icon" onClick={copyInviteCode}>
+                    <Button variant="ghost" size="icon" className="hover:bg-primary/10 hover:text-primary" onClick={copyInviteCode}>
                       <Copy className="w-4 h-4" />
                     </Button>
                   </div>

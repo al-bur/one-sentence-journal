@@ -77,9 +77,9 @@ export function GroupAnswers({ dailyQuestionId, userId, groups }: GroupAnswersPr
     return (
       <div className="space-y-4">
         {[1, 2].map(i => (
-          <div key={i} className="glass rounded-2xl p-5">
+          <div key={i} className="card p-5">
             <div className="flex items-start gap-4">
-              <Skeleton className="w-12 h-12 rounded-2xl" />
+              <Skeleton className="w-12 h-12 rounded-xl" />
               <div className="flex-1 space-y-3">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-16 w-full rounded-xl" />
@@ -93,9 +93,9 @@ export function GroupAnswers({ dailyQuestionId, userId, groups }: GroupAnswersPr
 
   if (answers.length === 0) {
     return (
-      <div className="glass rounded-3xl p-12 text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/10 flex items-center justify-center">
-          <MessageCircle className="w-8 h-8 text-primary" />
+      <div className="card-elevated p-12 text-center">
+        <div className="feature-icon feature-icon-blue mx-auto mb-4">
+          <MessageCircle className="w-6 h-6" />
         </div>
         <p className="text-muted-foreground">
           아직 답변한 그룹원이 없어요
@@ -109,7 +109,7 @@ export function GroupAnswers({ dailyQuestionId, userId, groups }: GroupAnswersPr
       {answers.map((answer, index) => (
         <div
           key={answer.id}
-          className="glass rounded-2xl p-5 animate-fade-in"
+          className="card p-5 animate-fade-in"
           style={{ animationDelay: `${index * 0.1}s` }}
         >
           <div className="flex items-start gap-4">
@@ -118,11 +118,11 @@ export function GroupAnswers({ dailyQuestionId, userId, groups }: GroupAnswersPr
               alt={answer.user_name}
               fallback={answer.user_name}
               size="md"
-              className="w-12 h-12 rounded-2xl border-2 border-primary/20"
+              className="w-12 h-12 rounded-xl border border-border"
             />
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm mb-3">{answer.user_name}</p>
-              <div className="p-4 rounded-xl bg-gradient-to-br from-secondary/50 to-secondary/30 border border-border/30">
+              <div className="p-4 rounded-xl bg-secondary border border-border">
                 <p className="text-foreground leading-relaxed">
                   {answer.content}
                 </p>

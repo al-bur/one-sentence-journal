@@ -27,25 +27,75 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-/* 2026 Modern Minimal Theme */
+/* ========================================
+   Toss/Apple Design System
+   Clean, Minimal, Premium
+   ======================================== */
+
 :root {
-  --radius: 1.25rem;
-  --background: #09090B;
-  --foreground: #FAFAFA;
-  --card: rgba(24, 24, 27, 0.8);
-  --card-foreground: #FAFAFA;
-  --primary: #A78BFA;
-  --primary-foreground: #09090B;
-  --secondary: #27272A;
-  --secondary-foreground: #FAFAFA;
-  --muted: #3F3F46;
-  --muted-foreground: #A1A1AA;
-  --accent: #F0ABFC;
-  --accent-foreground: #09090B;
-  --destructive: #F87171;
-  --border: rgba(63, 63, 70, 0.5);
-  --input: #27272A;
-  --ring: #A78BFA;
+  --radius: 1rem;
+
+  /* Pure White Background */
+  --background: #FFFFFF;
+  --foreground: #191F28;
+
+  /* Card - Clean white with subtle shadow */
+  --card: #FFFFFF;
+  --card-foreground: #191F28;
+
+  /* Primary - Toss Blue */
+  --primary: #3182F6;
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary - Light gray */
+  --secondary: #F2F4F6;
+  --secondary-foreground: #4E5968;
+
+  /* Muted */
+  --muted: #F9FAFB;
+  --muted-foreground: #8B95A1;
+
+  /* Accent - Soft coral for highlights */
+  --accent: #F2F4F6;
+  --accent-foreground: #191F28;
+
+  /* Destructive */
+  --destructive: #F04452;
+
+  /* Success */
+  --success: #03C75A;
+
+  /* Borders - Very subtle */
+  --border: #E5E8EB;
+  --input: #F2F4F6;
+  --ring: #3182F6;
+}
+
+.dark {
+  --background: #0D1117;
+  --foreground: #F0F6FC;
+
+  --card: #161B22;
+  --card-foreground: #F0F6FC;
+
+  --primary: #58A6FF;
+  --primary-foreground: #0D1117;
+
+  --secondary: #21262D;
+  --secondary-foreground: #C9D1D9;
+
+  --muted: #161B22;
+  --muted-foreground: #8B949E;
+
+  --accent: #21262D;
+  --accent-foreground: #F0F6FC;
+
+  --destructive: #F85149;
+  --success: #3FB950;
+
+  --border: #30363D;
+  --input: #21262D;
+  --ring: #58A6FF;
 }
 
 @layer base {
@@ -53,71 +103,131 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
-/* Scrollbar */
+/* ========================================
+   Scrollbar - Minimal
+   ======================================== */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--secondary);
-  border-radius: 3px;
+  background: #D1D5DB;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted);
+  background: #9CA3AF;
 }
 
-/* Selection */
+.dark ::-webkit-scrollbar-thumb {
+  background: #4B5563;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6B7280;
+}
+
+/* ========================================
+   Selection
+   ======================================== */
 ::selection {
   background: var(--primary);
   color: var(--primary-foreground);
 }
 
-/* Aurora background animation */
-@keyframes aurora {
-  0%, 100% {
-    opacity: 0.3;
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: translateY(-20px) scale(1.05);
-  }
+/* ========================================
+   Card Styles - Clean with soft shadow
+   ======================================== */
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.aurora-bg {
-  animation: aurora 8s ease-in-out infinite;
+.card-elevated {
+  background: var(--card);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.03),
+    0 2px 4px rgba(0, 0, 0, 0.04),
+    0 12px 24px rgba(0, 0, 0, 0.04);
 }
 
-/* Stars background */
-.stars-bg {
-  background-image:
-    radial-gradient(2px 2px at 20px 30px, #FCD34D, transparent),
-    radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
-    radial-gradient(1px 1px at 90px 40px, #FCD34D, transparent),
-    radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.6), transparent),
-    radial-gradient(1px 1px at 230px 80px, #FCD34D, transparent),
-    radial-gradient(2px 2px at 300px 150px, rgba(255,255,255,0.7), transparent),
-    radial-gradient(1px 1px at 350px 50px, rgba(255,255,255,0.5), transparent);
-  background-size: 400px 200px;
-  animation: twinkle 4s ease-in-out infinite alternate;
+.card-interactive {
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
 }
 
-@keyframes twinkle {
-  0% { opacity: 0.6; }
-  100% { opacity: 1; }
+.card-interactive:hover {
+  border-color: var(--primary);
+  box-shadow:
+    0 0 0 1px var(--primary),
+    0 4px 12px rgba(49, 130, 246, 0.08);
 }
 
-/* Fade in animation */
-@keyframes fadeIn {
+/* ========================================
+   Typography
+   ======================================== */
+.text-display {
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.text-headline {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.text-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-body {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.text-caption {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* ========================================
+   Subtle Animations - Apple style
+   ======================================== */
+
+/* Fade In Up - subtle */
+@keyframes fadeInUp {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -129,133 +239,200 @@
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 
-/* Float animation for moon */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Pulse animation for accent */
-@keyframes pulse-accent {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(252, 211, 77, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 20px 5px rgba(252, 211, 77, 0.2);
-  }
-}
-
-.pulse-accent {
-  animation: pulse-accent 3s ease-in-out infinite;
-}
-
-/* Glow effect */
-.glow {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
-}
-
-/* Card hover effect */
-.card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-hover:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(167, 139, 250, 0.15);
-  border-color: rgba(167, 139, 250, 0.3);
-}
-
-/* Glass morphism */
-.glass {
-  background: rgba(24, 24, 27, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(63, 63, 70, 0.3);
-}
-
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #A78BFA 0%, #F0ABFC 50%, #A78BFA 100%);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradient-shift 4s ease infinite;
-}
-
-@keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-/* Subtle glow */
-.subtle-glow {
-  box-shadow: 0 0 60px rgba(167, 139, 250, 0.15);
-}
-
-/* Hover glow */
-.hover-glow {
-  transition: box-shadow 0.3s ease;
-}
-
-.hover-glow:hover {
-  box-shadow: 0 0 40px rgba(167, 139, 250, 0.25);
-}
-
-/* Star border animations */
-@keyframes star-movement-bottom {
-  0% { transform: translate(0%, 0%); opacity: 1; }
-  100% { transform: translate(-100%, 0%); opacity: 0; }
-}
-
-@keyframes star-movement-top {
-  0% { transform: translate(0%, 0%); opacity: 1; }
-  100% { transform: translate(100%, 0%); opacity: 0; }
-}
-
-.animate-star-movement-bottom {
-  animation: star-movement-bottom linear infinite alternate;
-}
-
-.animate-star-movement-top {
-  animation: star-movement-top linear infinite alternate;
-}
-
-/* Smooth entrance */
-@keyframes slideUp {
+/* Scale In */
+@keyframes scaleIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
 }
 
-.animate-slide-up {
-  animation: slideUp 0.6s ease-out forwards;
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
 }
 
-/* Stagger children */
+/* Stagger - minimal delay */
 .stagger-children > * {
   opacity: 0;
-  animation: slideUp 0.5s ease-out forwards;
+  animation: fadeInUp 0.4s ease-out forwards;
 }
 
-.stagger-children > *:nth-child(1) { animation-delay: 0.1s; }
-.stagger-children > *:nth-child(2) { animation-delay: 0.2s; }
-.stagger-children > *:nth-child(3) { animation-delay: 0.3s; }
-.stagger-children > *:nth-child(4) { animation-delay: 0.4s; }
-.stagger-children > *:nth-child(5) { animation-delay: 0.5s; }
+.stagger-children > *:nth-child(1) { animation-delay: 0s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.25s; }
+
+/* ========================================
+   Button Styles - Toss style
+   ======================================== */
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: #1B6FE8;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background: #E5E8EB;
+}
+
+/* ========================================
+   Badge
+   ======================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 6px;
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.badge-primary {
+  background: rgba(49, 130, 246, 0.1);
+  color: var(--primary);
+}
+
+.badge-success {
+  background: rgba(3, 199, 90, 0.1);
+  color: var(--success);
+}
+
+/* ========================================
+   Focus States - Minimal
+   ======================================== */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
+}
+
+/* ========================================
+   Divider
+   ======================================== */
+.divider {
+  height: 1px;
+  background: var(--border);
+}
+
+/* ========================================
+   Empty State
+   ======================================== */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: var(--secondary);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========================================
+   Input Styles
+   ======================================== */
+.input-clean {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1rem;
+  background: var(--input);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: all 0.15s ease;
+}
+
+.input-clean:focus {
+  outline: none;
+  background: var(--background);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.1);
+}
+
+.input-clean::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* ========================================
+   Loading Skeleton
+   ======================================== */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--secondary) 25%,
+    #E5E8EB 50%,
+    var(--secondary) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ========================================
+   Feature Icon - Toss style
+   ======================================== */
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-icon-blue {
+  background: rgba(49, 130, 246, 0.1);
+  color: var(--primary);
+}
+
+.feature-icon-green {
+  background: rgba(3, 199, 90, 0.1);
+  color: var(--success);
+}
+
+.feature-icon-gray {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+}

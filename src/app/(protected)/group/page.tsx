@@ -72,13 +72,11 @@ export default async function GroupPage() {
     <div className="max-w-2xl mx-auto space-y-8 pb-24">
       {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium mb-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary text-secondary-foreground text-xs font-medium mb-2">
           <Users className="w-3 h-3" />
           {groupsWithMembers.length}개의 그룹
         </div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          <span className="gradient-text">그룹</span>
-        </h1>
+        <h1 className="text-2xl font-bold">그룹</h1>
         <p className="text-muted-foreground">소중한 사람들과 함께해요</p>
       </div>
 
